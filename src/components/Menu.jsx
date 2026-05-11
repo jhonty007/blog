@@ -1,48 +1,51 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
 
-function Menu() {
+const Menu = ({ cat, currentPostId }) => {
+  const [posts, setPosts] = useState([]);
 
-  const posts = [
-    {
-      id: 1,
-      title: "Lorem ipsum dolor sit amet consectetur adipisicing elit",
-      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. A possimus excepturi aliquid nihil cumque ipsam facere aperiam at! Ea dolorem ratione sit debitis deserunt repellendus numquam ab vel perspiciatis corporis!",
-      img: "https://images.pexels.com/photos/7008010/pexels-photo-7008010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    },
-    {
-      id: 2,
-      title: "Lorem ipsum dolor sit amet consectetur adipisicing elit",
-      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. A possimus excepturi aliquid nihil cumque ipsam facere aperiam at! Ea dolorem ratione sit debitis deserunt repellendus numquam ab vel perspiciatis corporis!",
-      img: "https://images.pexels.com/photos/6489663/pexels-photo-6489663.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    },
-    {
-      id: 3,
-      title: "Lorem ipsum dolor sit amet consectetur adipisicing elit",
-      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. A possimus excepturi aliquid nihil cumque ipsam facere aperiam at! Ea dolorem ratione sit debitis deserunt repellendus numquam ab vel perspiciatis corporis!",
-      img: "https://images.pexels.com/photos/4230630/pexels-photo-4230630.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    },
-    {
-      id: 4,
-      title: "Lorem ipsum dolor sit amet consectetur adipisicing elit",
-      desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. A possimus excepturi aliquid nihil cumque ipsam facere aperiam at! Ea dolorem ratione sit debitis deserunt repellendus numquam ab vel perspiciatis corporis!",
-      img: "https://images.pexels.com/photos/6157049/pexels-photo-6157049.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(`/api/posts${cat ? `?cat=${cat}` : ""}`);
+        const filtered = res.data.filter(
+          (p) => p.id !== parseInt(currentPostId, 10)
+        );
+        setPosts(filtered.slice(0, 4));
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    if (cat) {
+      fetchData();
+    }
+  }, [cat, currentPostId]);
 
   return (
-    
-      <div className="menu">
-        <h1>Other Posts You May Like</h1>
-      {posts.map((post)=>(
-          <div className="post" key={post.id}>
-            <img src={post.img} alt="" />
-            <h2>{post.title}</h2>
+    <div className="menu">
+      <h1>Other Posts You May Like</h1>
+      {posts.length === 0 && <p>No related posts found.</p>}
+      {posts.map((post) => (
+        <div className="post" key={post.id}>
+          <img
+            src={
+              post.img
+                ? post.img.startsWith("http")
+                  ? post.img
+                  : `/upload/${post.img}`
+                : "https://images.pexels.com/photos/7008010/pexels-photo-7008010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            }
+            alt=""
+          />
+          <h2>{post.title}</h2>
+          <Link to={`/post/${post.id}`}>
             <button>Read More</button>
-          </div>
+          </Link>
+        </div>
       ))}
-      </div>
-    
-  )
-}
+    </div>
+  );
+};
 
-export default Menu
+export default Menu;
