@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -10,7 +9,6 @@ const Register = () => {
     password: "",
   });
   const [err, setError] = useState(null);
-
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -20,10 +18,10 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("/auth/register", inputs);
+      await axios.post("/api/auth/register", inputs);
       navigate("/login");
     } catch (err) {
-      setError(err.response.data);
+      setError(err.response?.data || "Something went wrong.");
     }
   };
 
@@ -34,21 +32,21 @@ const Register = () => {
         <input
           required
           type="text"
-          placeholder="username"
+          placeholder="Username"
           name="username"
           onChange={handleChange}
         />
         <input
           required
           type="email"
-          placeholder="email"
+          placeholder="Email"
           name="email"
           onChange={handleChange}
         />
         <input
           required
           type="password"
-          placeholder="password"
+          placeholder="Password"
           name="password"
           onChange={handleChange}
         />

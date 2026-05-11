@@ -1,70 +1,126 @@
-# Getting Started with Create React App
+# Blog Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack blog application built with React and Node.js/Express with PostgreSQL.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Authentication**: User registration, login, and logout with JWT tokens (httpOnly cookies)
+- **Posts**: Create, read, update, and delete blog posts with rich text editor
+- **Categories**: Filter posts by category (Art, Science, Technology, Cinema, Design, Food)
+- **Comments**: Add and delete comments on posts
+- **Likes**: Like/unlike posts
+- **Image Upload**: Upload images for blog posts
+- **User Profiles**: View and update user profiles
+- **Related Posts**: See related posts by category on the single post page
 
-### `npm start`
+## Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Frontend**: React 18, React Router v6, React Quill (rich text), Axios, SCSS
+- **Backend**: Node.js, Express.js
+- **Database**: PostgreSQL
+- **Auth**: JWT + bcrypt with httpOnly cookies
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Prerequisites
 
-### `npm test`
+- Node.js (v16+)
+- PostgreSQL (v14+)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Setup
 
-### `npm run build`
+### 1. Database Setup
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+# Create PostgreSQL user and database
+sudo -u postgres psql -c "CREATE USER blog_user WITH PASSWORD 'blog_password';"
+sudo -u postgres psql -c "CREATE DATABASE blog_db OWNER blog_user;"
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 2. Backend Setup
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+cd api
+cp .env.example .env  # Edit .env with your database credentials and JWT secret
+npm install
+npm run init-db       # Creates all database tables
+npm run dev           # Starts backend on port 8000
+```
 
-### `npm run eject`
+### 3. Frontend Setup
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```bash
+# From root directory
+npm install
+npm start             # Starts frontend on port 3000
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The frontend proxies API requests to `http://localhost:8000`.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## API Endpoints
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Auth
+- `POST /api/auth/register` - Register a new user
+- `POST /api/auth/login` - Login
+- `POST /api/auth/logout` - Logout
 
-## Learn More
+### Posts
+- `GET /api/posts` - Get all posts (optional `?cat=category` filter)
+- `GET /api/posts/:id` - Get single post
+- `POST /api/posts` - Create post (authenticated)
+- `PUT /api/posts/:id` - Update post (authenticated, owner only)
+- `DELETE /api/posts/:id` - Delete post (authenticated, owner only)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Comments
+- `GET /api/comments/:postId` - Get comments for a post
+- `POST /api/comments` - Add comment (authenticated)
+- `DELETE /api/comments/:id` - Delete comment (authenticated, owner only)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Likes
+- `GET /api/likes/:postId` - Get likes for a post
+- `POST /api/likes` - Toggle like (authenticated)
 
-### Code Splitting
+### Users
+- `GET /api/users/:id` - Get user profile
+- `PUT /api/users/:id` - Update user profile (authenticated, owner only)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Upload
+- `POST /api/upload` - Upload an image file
 
-### Analyzing the Bundle Size
+## Project Structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```
+blog/
+├── api/                    # Backend
+│   ├── controllers/        # Route handlers
+│   │   ├── auth.js
+│   │   ├── comments.js
+│   │   ├── likes.js
+│   │   ├── posts.js
+│   │   └── users.js
+│   ├── routes/             # Express routes
+│   │   ├── auth.js
+│   │   ├── comments.js
+│   │   ├── likes.js
+│   │   ├── posts.js
+│   │   └── users.js
+│   ├── upload/             # Uploaded images
+│   ├── db.js               # PostgreSQL connection pool
+│   ├── index.js            # Express app entry point
+│   ├── init-db.js          # Database table creation script
+│   └── package.json
+├── src/                    # Frontend (React)
+│   ├── components/
+│   │   ├── Footer.jsx
+│   │   ├── Menu.jsx
+│   │   └── Navbar.jsx
+│   ├── context/
+│   │   └── authContext.js
+│   ├── pages/
+│   │   ├── Home.jsx
+│   │   ├── Login.jsx
+│   │   ├── Register.jsx
+│   │   ├── Single.jsx
+│   │   └── Write.jsx
+│   ├── styles.scss
+│   └── App.js
+└── package.json
+```
